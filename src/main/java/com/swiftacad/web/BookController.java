@@ -45,4 +45,35 @@ public class BookController {
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
+	
+	@RequestMapping(value="/book/name/{name}", method = RequestMethod.GET)
+	public ResponseEntity<List<Book>> findBooksByName(@PathVariable String name) {
+		if(name == null || name.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		List<Book> books = bookRepository.findByName(name);
+		return new ResponseEntity<>(books, HttpStatus.OK);
+		
+	}
+	
+	@RequestMapping(value="/book/name/{name}/isbn/{isbn}", method = RequestMethod.GET)
+	public ResponseEntity<List<Book>> findBooks(@PathVariable String name, @PathVariable String isbn){
+		return new ResponseEntity<>(bookRepository.findByNameAndIsbn(name, isbn), 
+				HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/book", method = RequestMethod.PUT)
+	public ResponseEntity<Book> updateBook(@RequestBody Book book) {
+		if(book.getId() == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		Optional<Book> bookOpt = bookRepository.findById(book.getId());
+		if(!bookOpt.isPresent()) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		Book updatedRecord = bookRepository.save(book);
+		return new ResponseEntity<>(updatedRecord, HttpStatus.ACCEPTED);
+	}
+	
+	
 }
